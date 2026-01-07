@@ -65,7 +65,11 @@ class ProfileScreen extends ConsumerWidget {
                   height: 48,
                   child: ElevatedButton(
                     onPressed: () => ref.read(sessionControllerProvider.notifier).logout(),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD9D9D9), foregroundColor: Colors.black, elevation: 0),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE44C4C),
+                      foregroundColor: Colors.white,
+                      elevation: 2,
+                    ),
                     child: Text(t.signOut),
                   ),
                 ),

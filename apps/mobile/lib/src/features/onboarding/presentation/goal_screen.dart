@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../ui/damu_colors.dart';
+import '../../../ui/damu_widgets.dart';
 import 'package:damu_app/gen_l10n/app_localizations.dart';
 import '../../auth/presentation/session_controller.dart';
 import '../../home/presentation/water_controller.dart';
@@ -23,39 +24,39 @@ class _GoalScreenState extends ConsumerState<GoalScreen> {
     final goal = _weight.round() * 30;
 
     return Scaffold(
-      backgroundColor: DamuColors.lightBg,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 22),
-          child: Column(
-            children: [
-              const SizedBox(height: 6),
-              Text(
-                t.goalTitle,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.black87, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 22),
-              _WeightRuler(
-                weight: _weight.round(),
-                onChanged: busy ? null : (v) => setState(() => _weight = v.toDouble()),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                t.goalFormula(_weight.round().toString(), goal.toString()),
-                style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w700),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                t.goalHint(goal.toString()),
-                style: TextStyle(color: Colors.black.withValues(alpha: 0.7)),
-                textAlign: TextAlign.center,
-              ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 62,
-                child: ElevatedButton(
+      backgroundColor: Colors.transparent,
+      body: Container(
+        decoration: const BoxDecoration(gradient: DamuGradients.hero),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22),
+            child: Column(
+              children: [
+                const SizedBox(height: 6),
+                Text(
+                  '🎯 ${t.goalTitle}',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 22),
+                _WeightRuler(
+                  weight: _weight.round(),
+                  onChanged: busy ? null : (v) => setState(() => _weight = v.toDouble()),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  t.goalFormula(_weight.round().toString(), goal.toString()),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  t.goalHint(goal.toString()),
+                  style: const TextStyle(color: DamuColors.textMutedLight),
+                  textAlign: TextAlign.center,
+                ),
+                const Spacer(),
+                DamuPillButton(
+                  text: t.finishButton,
                   onPressed: busy
                       ? null
                       : () async {
@@ -66,16 +67,14 @@ class _GoalScreenState extends ConsumerState<GoalScreen> {
                           await waterNotifier.refresh();
                           if (nav.mounted) nav.maybePop();
                         },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2BA0B9),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
-                    elevation: 0,
-                  ),
-                  child: Text(t.finishButton, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
+                  background: Colors.white,
+                  foreground: DamuColors.primaryDeep,
+                  height: 62,
+                  radius: 26,
                 ),
-              ),
-              const SizedBox(height: 22),
-            ],
+                const SizedBox(height: 22),
+              ],
+            ),
           ),
         ),
       ),
@@ -94,22 +93,24 @@ class _WeightRuler extends StatelessWidget {
       height: 260,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFF93CBE3),
+        gradient: DamuGradients.glass,
         borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
+        boxShadow: const [BoxShadow(color: DamuColors.shadow, blurRadius: 14, offset: Offset(0, 8))],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
       child: Column(
         children: [
-          Text(weight.toString(), style: const TextStyle(fontSize: 64, fontWeight: FontWeight.w900, color: Colors.black)),
+          Text(weight.toString(), style: const TextStyle(fontSize: 64, fontWeight: FontWeight.w900, color: DamuColors.primaryDeep)),
           const SizedBox(height: 10),
-          const Text('kg', style: TextStyle(fontWeight: FontWeight.w700)),
+          const Text('kg', style: TextStyle(fontWeight: FontWeight.w700, color: DamuColors.textPrimary)),
           const Spacer(),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               trackHeight: 6,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
-              activeTrackColor: const Color(0xFF2BA0B9),
+              activeTrackColor: DamuColors.primaryDeep,
               inactiveTrackColor: Colors.white54,
             ),
             child: Slider(
@@ -137,10 +138,10 @@ class _RulerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()
-      ..color = Colors.black87
+      ..color = DamuColors.primaryDeep
       ..strokeWidth = 2;
     final tick = Paint()
-      ..color = Colors.black45
+      ..color = DamuColors.textMuted
       ..strokeWidth = 1;
 
     final min = 40;
@@ -155,7 +156,7 @@ class _RulerPainter extends CustomPainter {
       canvas.drawLine(Offset(x, size.height), Offset(x, size.height - h), isMajor ? p : tick);
       if (isMajor) {
         final tp = TextPainter(
-          text: TextSpan(text: v.toString(), style: const TextStyle(color: Colors.black45, fontSize: 16, fontWeight: FontWeight.w700)),
+          text: TextSpan(text: v.toString(), style: const TextStyle(color: DamuColors.textMuted, fontSize: 16, fontWeight: FontWeight.w700)),
           textDirection: TextDirection.ltr,
         )..layout();
         tp.paint(canvas, Offset(x - tp.width / 2, 0));

@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { ApiError } from "../errors/ApiError.js";
 import { UserModel } from "../models/User.js";
@@ -41,4 +42,41 @@ export async function loginUser(env, input) {
 
 export function signToken(env, userId) {
   return jwt.sign({}, env.JWT_SECRET, { subject: userId, expiresIn: env.JWT_EXPIRES_IN });
+}
+
+export async function requestPasswordReset(env, email) {
+  const normalizedEmail = normalizeEmail(email);
+  const user = await UserModel.findOne({ email: normalizedEmail }).exec();
+  if (!user) return null;
+
+  const token = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+  const tokenHash = hashResetToken(token);
+  const expiresAt = new Date(Date.now() + env.PASSWORD_RESET_TOKEN_TTL_MINUTES * 60 * 1000);
+
+  user.passwordResetTokenHash = tokenHash;
+  user.passwordResetExpiresAt = expiresAt;
+  await user.save();
+
+  return { user, token, expiresAt };
+}
+
+export async function resetPassword(env, input) {
+  const tokenHash = hashResetToken(input.token);
+  const user = await UserModel.findOne({
+    passwordResetTokenHash: tokenHash,
+    passwordResetExpiresAt: { $gt: new Date() }
+  }).exec();
+  if (!user) throw new ApiError(400, "invalid_reset_token", "Reset link is invalid or expired");
+
+  user.passwordHash = await bcrypt.hash(input.password, env.PASSWORD_BCRYPT_ROUNDS);
+  user.passwordResetTokenHash = undefined;
+  user.passwordResetExpiresAt = undefined;
+  await user.save();
+
+  const token = signToken(env, user._id.toString());
+  return { user, token };
+}
+
+function hashResetToken(token) {
+  return crypto.createHash("sha256").update(token).digest("hex");
 }

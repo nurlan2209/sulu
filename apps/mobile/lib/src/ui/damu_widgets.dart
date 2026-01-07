@@ -30,7 +30,10 @@ class DamuPillButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: background,
           foregroundColor: foreground,
-          elevation: 0,
+          elevation: 8,
+          shadowColor: background.withValues(alpha: 0.35),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, letterSpacing: 0.4),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
         ),
         child: Text(text),
@@ -70,35 +73,38 @@ class _DamuTextFieldState extends State<DamuTextField> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: DamuColors.card,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [BoxShadow(color: DamuColors.shadow, blurRadius: 12, offset: Offset(0, 6))],
+        gradient: DamuGradients.glass,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.6)),
+        boxShadow: const [BoxShadow(color: DamuColors.shadow, blurRadius: 14, offset: Offset(0, 8))],
       ),
       child: TextField(
         controller: widget.controller,
         obscureText: _obscure,
         decoration: InputDecoration(
           hintText: widget.hint,
-          prefixIcon: Icon(widget.prefixIcon, color: DamuColors.textMuted),
-          suffixIcon: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (widget.obscure)
-                IconButton(
-                  onPressed: () => setState(() => _obscure = !_obscure),
-                  icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: DamuColors.textMuted),
-                ),
-              IconButton(
-                onPressed: widget.controller.text.isEmpty
-                    ? null
-                    : () {
-                        widget.controller.clear();
-                        setState(() {});
-                      },
-                icon: const Icon(Icons.delete_outline, color: DamuColors.textMuted),
-              ),
-            ],
-          ),
+          hintStyle: const TextStyle(color: DamuColors.textMuted),
+          prefixIcon: Icon(widget.prefixIcon, color: DamuColors.accent),
+          suffixIcon: (widget.obscure || widget.controller.text.isNotEmpty)
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.obscure)
+                      IconButton(
+                        onPressed: () => setState(() => _obscure = !_obscure),
+                        icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: DamuColors.textMuted),
+                      ),
+                    if (widget.controller.text.isNotEmpty)
+                      IconButton(
+                        onPressed: () {
+                          widget.controller.clear();
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.close, color: DamuColors.textMuted),
+                      ),
+                  ],
+                )
+              : null,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
         ),

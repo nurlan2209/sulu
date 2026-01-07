@@ -193,8 +193,9 @@ class _BottomBar extends StatelessWidget {
           Container(
             height: 60,
             decoration: BoxDecoration(
-              color: DamuColors.lightBg,
+              color: DamuColors.primaryDeep.withOpacity(0.92),
               borderRadius: BorderRadius.circular(28),
+              boxShadow: const [BoxShadow(color: DamuColors.shadow, blurRadius: 14, offset: Offset(0, 6))],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -215,10 +216,11 @@ class _BottomBar extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF7E8CA0),
+                  color: Colors.white,
                   shape: BoxShape.circle,
+                  boxShadow: const [BoxShadow(color: DamuColors.shadow, blurRadius: 12, offset: Offset(0, 6))],
                 ),
-                child: const Icon(Icons.add, color: Colors.white, size: 28),
+                child: Icon(Icons.add, color: DamuColors.primaryDeep, size: 28),
               ),
             ),
           ),
@@ -240,7 +242,7 @@ class _NavIcon extends StatelessWidget {
       onPressed: onTap,
       icon: Icon(
         icon,
-        color: selected ? const Color(0xFF4B647F) : const Color(0x994B647F),
+        color: selected ? Colors.white : Colors.white70,
       ),
     );
   }

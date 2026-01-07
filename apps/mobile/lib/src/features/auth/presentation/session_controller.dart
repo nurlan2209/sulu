@@ -64,6 +64,17 @@ class SessionController extends AsyncNotifier<Session?> {
     });
   }
 
+  Future<void> resetPassword({required String token, required String password}) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final result = await ref.read(authApiProvider).resetPassword(token: token, password: password);
+      final session = Session(token: result.$1, user: result.$2);
+      await ref.read(tokenStorageProvider).write(session.token);
+      _syncLocaleFromUser(session.user.language);
+      return session;
+    });
+  }
+
   Future<void> logout() async {
     await ref.read(tokenStorageProvider).delete();
     state = const AsyncData(null);

@@ -19,7 +19,13 @@ class HomeScreen extends ConsumerWidget {
     final progress = ref.watch(waterControllerProvider);
 
     return Container(
-      color: DamuColors.lightBg,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFF0F7FF), Color(0xFFE1EDFF)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         children: [
@@ -96,7 +102,7 @@ class _ProgressPill extends StatelessWidget {
     return Container(
       width: pillW,
       height: 56,
-      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.85), borderRadius: BorderRadius.circular(18)),
+      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.95), borderRadius: BorderRadius.circular(18)),
       child: Stack(
         children: [
           FractionallySizedBox(
@@ -133,7 +139,11 @@ class _ActionCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         height: 86,
-        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.4), borderRadius: BorderRadius.circular(18)),
+        decoration: BoxDecoration(
+          color: DamuColors.primaryDeep,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [BoxShadow(color: DamuColors.shadow, blurRadius: 18, offset: Offset(0, 10))],
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: Row(
@@ -141,8 +151,8 @@ class _ActionCard extends StatelessWidget {
               Container(
                 width: 44,
                 height: 44,
-                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                child: Icon(icon, color: const Color(0xFF00B0E6)),
+                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), shape: BoxShape.circle),
+                child: Icon(icon, color: DamuColors.primaryDeep),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -150,10 +160,10 @@ class _ActionCard extends StatelessWidget {
                   text,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Colors.black45),
+              const Icon(Icons.chevron_right, color: Colors.white),
             ],
           ),
         ),

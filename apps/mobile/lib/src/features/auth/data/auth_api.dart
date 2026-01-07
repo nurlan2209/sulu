@@ -32,6 +32,15 @@ class AuthApi {
     return (_token(json), User.fromJson(json['user'] as Map<String, dynamic>));
   }
 
+  Future<void> forgotPassword({required String email}) async {
+    await _api.postJson('/auth/forgot', body: {'email': email});
+  }
+
+  Future<(String token, User user)> resetPassword({required String token, required String password}) async {
+    final json = await _api.postJson('/auth/reset', body: {'token': token, 'password': password});
+    return (_token(json), User.fromJson(json['user'] as Map<String, dynamic>));
+  }
+
   String _token(Map<String, dynamic> json) => (json['token'] ?? '').toString();
 }
 

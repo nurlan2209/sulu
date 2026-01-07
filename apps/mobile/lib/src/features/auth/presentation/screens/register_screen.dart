@@ -34,69 +34,73 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final session = ref.watch(sessionControllerProvider);
 
     return Scaffold(
-      backgroundColor: DamuColors.startBg,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(t.appTitle, style: DamuTextStyles.title()),
-                  const SizedBox(height: 14),
-                  Container(
-                    width: 120,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(4),
+      backgroundColor: Colors.transparent,
+      body: Container(
+        decoration: const BoxDecoration(gradient: DamuGradients.hero),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text('✨ ${t.appTitle}', style: DamuTextStyles.title()),
+                    const SizedBox(height: 14),
+                    Container(
+                      width: 120,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 26),
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(22),
-                      boxShadow: const [BoxShadow(color: DamuColors.shadow, blurRadius: 12, offset: Offset(0, 8))],
+                    const SizedBox(height: 26),
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        gradient: DamuGradients.glass,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
+                        boxShadow: const [BoxShadow(color: DamuColors.shadow, blurRadius: 16, offset: Offset(0, 10))],
+                      ),
+                      child: Column(
+                        children: [
+                          DamuTextField(controller: _fullName, hint: t.fullNameHint, prefixIcon: Icons.person_outline),
+                          const SizedBox(height: 14),
+                          DamuTextField(controller: _email, hint: t.emailHint, prefixIcon: Icons.mail_outline),
+                          const SizedBox(height: 14),
+                          DamuTextField(controller: _password, hint: t.passwordHint, prefixIcon: Icons.lock_outline, obscure: true),
+                          const SizedBox(height: 22),
+                          DamuPillButton(
+                            text: t.registerButton,
+                            onPressed: session.isLoading
+                                ? null
+                                : () async {
+                                    await ref.read(sessionControllerProvider.notifier).register(
+                                          fullName: _fullName.text.trim(),
+                                          email: _email.text.trim(),
+                                          password: _password.text,
+                                        );
+                                    if (!context.mounted) return;
+                                    context.go('/onboarding/goal');
+                                  },
+                            background: DamuColors.primaryDeep,
+                            foreground: Colors.white,
+                          ),
+                          const SizedBox(height: 12),
+                          DamuPillButton(
+                            text: t.loginButton,
+                            onPressed: () => context.go('/auth/login'),
+                            background: Colors.white.withValues(alpha: 0.85),
+                            foreground: DamuColors.primaryDeep,
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Column(
-                      children: [
-                        DamuTextField(controller: _fullName, hint: t.fullNameHint, prefixIcon: Icons.person_outline),
-                        const SizedBox(height: 14),
-                        DamuTextField(controller: _email, hint: t.emailHint, prefixIcon: Icons.mail_outline),
-                        const SizedBox(height: 14),
-                        DamuTextField(controller: _password, hint: t.passwordHint, prefixIcon: Icons.lock_outline, obscure: true),
-                        const SizedBox(height: 22),
-                        DamuPillButton(
-                          text: t.registerButton,
-                          onPressed: session.isLoading
-                              ? null
-                              : () async {
-                                  await ref.read(sessionControllerProvider.notifier).register(
-                                        fullName: _fullName.text.trim(),
-                                        email: _email.text.trim(),
-                                        password: _password.text,
-                                      );
-                                  if (!context.mounted) return;
-                                  context.go('/onboarding/goal');
-                                },
-                          background: DamuColors.primary,
-                          foreground: Colors.white,
-                        ),
-                        const SizedBox(height: 12),
-                        DamuPillButton(
-                          text: t.loginButton,
-                          onPressed: () => context.go('/auth/login'),
-                          background: const Color(0xFFD9D9D9),
-                          foreground: Colors.black,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

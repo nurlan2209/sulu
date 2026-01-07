@@ -30,7 +30,9 @@ const UserSchema = new mongoose.Schema(
     timezone: { type: String, required: false },
     avatarUrl: { type: String, required: false, trim: true },
     notificationSettings: { type: NotificationSettingsSchema, required: true, default: () => ({}) },
-    streak: { type: Number, required: true, default: 0, min: 0 }
+    streak: { type: Number, required: true, default: 0, min: 0 },
+    passwordResetTokenHash: { type: String, required: false },
+    passwordResetExpiresAt: { type: Date, required: false }
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
