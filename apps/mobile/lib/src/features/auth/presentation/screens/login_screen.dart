@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../ui/damu_colors.dart';
-import '../../../../ui/damu_text_styles.dart';
-import '../../../../ui/damu_widgets.dart';
 import 'package:damu_app/gen_l10n/app_localizations.dart';
 import '../session_controller.dart';
 
@@ -18,6 +15,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
+  bool _obscure = true;
 
   @override
   void dispose() {
@@ -32,80 +30,139 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final session = ref.watch(sessionControllerProvider);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Container(
-        decoration: const BoxDecoration(gradient: DamuGradients.hero),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text('🚀 ${t.appTitle}', style: DamuTextStyles.title()),
-                    const SizedBox(height: 14),
-                    Container(
-                      width: 120,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.7),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 150),
+                Text(
+                  t.loginTitle,
+                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF2A2A2A)),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  t.loginSubtitle,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Color(0xFF9AA0A6)),
+                ),
+                const SizedBox(height: 36),
+                _AuthField(
+                  controller: _email,
+                  hint: t.emailHint,
+                  icon: Icons.mail_outline,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: 16),
+                _AuthField(
+                  controller: _password,
+                  hint: t.passwordHint,
+                  icon: Icons.lock_outline,
+                  obscureText: _obscure,
+                  textInputAction: TextInputAction.done,
+                  suffix: IconButton(
+                    onPressed: () => setState(() => _obscure = !_obscure),
+                    icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: const Color(0xFF9AA0A6)),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: session.isLoading
+                        ? null
+                        : () async {
+                            await ref.read(sessionControllerProvider.notifier).login(
+                                  email: _email.text.trim(),
+                                  password: _password.text,
+                                );
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2CA3C0),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, letterSpacing: 0.6),
                     ),
-                    const SizedBox(height: 26),
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        gradient: DamuGradients.glass,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
-                        boxShadow: const [BoxShadow(color: DamuColors.shadow, blurRadius: 16, offset: Offset(0, 10))],
-                      ),
-                      child: Column(
-                        children: [
-                          DamuTextField(controller: _email, hint: t.emailHint, prefixIcon: Icons.mail_outline),
-                          const SizedBox(height: 14),
-                          DamuTextField(controller: _password, hint: t.passwordHint, prefixIcon: Icons.lock_outline, obscure: true),
-                          const SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () => context.push('/auth/forgot', extra: _email.text.trim()),
-                              style: TextButton.styleFrom(foregroundColor: Colors.white),
-                              child: Text(t.forgotPasswordButton),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          DamuPillButton(
-                            text: t.loginButton,
-                            onPressed: session.isLoading
-                                ? null
-                                : () async {
-                                    await ref.read(sessionControllerProvider.notifier).login(
-                                          email: _email.text.trim(),
-                                          password: _password.text,
-                                        );
-                                  },
-                            background: DamuColors.primaryDeep,
-                            foreground: Colors.white,
-                          ),
-                          const SizedBox(height: 12),
-                          DamuPillButton(
-                            text: t.registerButton,
-                            onPressed: () => context.go('/auth/register'),
-                            background: Colors.white.withValues(alpha: 0.85),
-                            foreground: DamuColors.primaryDeep,
-                          ),
-                        ],
+                    child: Text(t.loginButton.toUpperCase()),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Center(
+                  child: TextButton(
+                    onPressed: () => context.push('/auth/forgot', extra: _email.text.trim()),
+                    style: TextButton.styleFrom(foregroundColor: const Color(0xFF2CA3C0)),
+                    child: Text(t.forgotPasswordButton),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(t.createAccountPrompt, style: const TextStyle(color: Color(0xFF6C7885), fontWeight: FontWeight.w600)),
+                    const SizedBox(width: 6),
+                    GestureDetector(
+                      onTap: () => context.go('/auth/register'),
+                      child: Text(
+                        t.registerButton,
+                        style: const TextStyle(color: Color(0xFF2CA3C0), fontWeight: FontWeight.w800),
                       ),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 12),
+              ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AuthField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hint;
+  final IconData icon;
+  final bool obscureText;
+  final Widget? suffix;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+
+  const _AuthField({
+    required this.controller,
+    required this.hint,
+    required this.icon,
+    this.obscureText = false,
+    this.suffix,
+    this.keyboardType,
+    this.textInputAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF4F4F4),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        textInputAction: textInputAction,
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: Color(0xFF9AA0A6)),
+          prefixIcon: Icon(icon, color: const Color(0xFF2CA3C0)),
+          suffixIcon: suffix,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         ),
       ),
     );

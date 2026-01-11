@@ -34,5 +34,5 @@ export function loadEnv() {
   }
 
   const env = parsed.data;
-  return { ...env, GEMINI_MODEL: "gemini-2.5-flash" };
+  return { ...env, GEMINI_MODEL: "gemini-3-flash-preview" };
 }

@@ -7,25 +7,35 @@ Monorepo:
 ## Requirements
 - Flutter `>=3.35`
 - Node `>=20`
-- Docker Desktop
+- MongoDB (local install or Atlas)
+- Docker Desktop (optional, for `docker-compose`)
 
 ## Environment
-Copy env examples:
-- `cp .env.example .env` (optional, for docker-compose)
+Copy the API env example and fill required values:
 - `cp apps/api/.env.example apps/api/.env`
 
-## Run backend (Docker)
-```bash
-docker compose up --build
-```
-API: `http://localhost:8080`
+Optional for `docker-compose` overrides, create a root `.env` with:
+- `API_PORT`
+- `MONGO_INITDB_ROOT_USERNAME`
+- `MONGO_INITDB_ROOT_PASSWORD`
 
-## Run backend (local)
+## Run backend (without Docker)
+Make sure MongoDB is available:
+- Atlas: set `MONGO_URI` in `apps/api/.env` to your connection string.
+- Local: install MongoDB and set `MONGO_URI=mongodb://127.0.0.1:27017/damu`.
+
+Then run:
 ```bash
 cd apps/api
 npm i
 npm run dev
 ```
+
+## Run backend (Docker, optional)
+```bash
+docker compose up --build
+```
+API: `http://localhost:8080`
 
 ## Run mobile
 ```bash

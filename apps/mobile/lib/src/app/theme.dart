@@ -9,7 +9,7 @@ class DamuTheme {
       useMaterial3: true,
       colorScheme: scheme,
       fontFamily: null,
-      scaffoldBackgroundColor: const Color(0xFF78B8F6),
+      scaffoldBackgroundColor: const Color(0xFFD9F4FA),
       appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent, elevation: 0),
     );
   }

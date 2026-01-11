@@ -30,8 +30,8 @@ class GeminiProvider {
     };
 
     const response = await this.ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `${system}\n\n${JSON.stringify(user)}`
+      model: "gemini-3-flash-preview",
+      contents: `${system}\n\n${JSON.stringify(user)}`,
     });
 
     const text = response?.text;

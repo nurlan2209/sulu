@@ -21,14 +21,18 @@ export async function getTodayProgress(input) {
 
   const from = startOfDayISO(input.timezone);
   const to = endOfDayISO(input.timezone);
-  const agg = await WaterLogModel.aggregate([
-    { $match: { userId: user._id, createdAt: { $gte: new Date(from), $lte: new Date(to) } } },
-    { $group: { _id: null, total: { $sum: "$amount" } } }
-  ]);
-  const consumed = agg[0]?.total ?? 0;
+  const logs = await WaterLogModel.find({ userId: user._id, createdAt: { $gte: new Date(from), $lte: new Date(to) } })
+    .sort({ createdAt: 1 })
+    .lean()
+    .exec();
+  const consumed = logs.reduce((sum, log) => sum + log.amount, 0);
   const goal = user.dailyWaterGoal ?? 0;
   const percent = goal > 0 ? Math.min(100, Math.round((consumed / goal) * 100)) : 0;
-  return { consumed, goal, percent };
+  const items = logs.map((log) => ({
+    time: DateTime.fromJSDate(log.createdAt).setZone(input.timezone).toFormat("HH:mm"),
+    amount: log.amount
+  }));
+  return { consumed, goal, percent, logs: items };
 }
 
 export async function getDailyTotals(input) {

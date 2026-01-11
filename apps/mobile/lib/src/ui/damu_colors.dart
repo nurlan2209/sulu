@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class DamuColors {
   static const startBg = Color(0xFF0E2D64);
-  static const lightBg = Color(0xFFF0F7FF);
+  static const lightBg = Color(0xFFD9F4FA);
   static const card = Color(0xFFF7FBFF);
 
   static const primary = Color(0xFF1F7BFF);

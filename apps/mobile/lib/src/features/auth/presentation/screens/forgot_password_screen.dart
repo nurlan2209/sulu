@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../ui/damu_colors.dart';
-import '../../../../ui/damu_text_styles.dart';
-import '../../../../ui/damu_widgets.dart';
 import 'package:damu_app/gen_l10n/app_localizations.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../data/auth_api.dart';
@@ -27,6 +24,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   bool _sendingEmail = false;
   bool _resetting = false;
   bool _emailSent = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
 
   @override
   void initState() {
@@ -51,92 +50,117 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     final session = ref.watch(sessionControllerProvider);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: Colors.white,
-        title: Text(t.forgotPasswordTitle),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(gradient: DamuGradients.hero),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 460),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text('🛡️ ${t.appTitle}', style: DamuTextStyles.title()),
-                    const SizedBox(height: 12),
-                    Text(
-                      t.forgotPasswordEnterEmail,
-                      style: const TextStyle(color: DamuColors.textMutedLight),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        gradient: DamuGradients.glass,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
-                        boxShadow: const [BoxShadow(color: DamuColors.shadow, blurRadius: 16, offset: Offset(0, 10))],
-                      ),
-                      child: Column(
-                        children: [
-                          DamuTextField(controller: _email, hint: t.emailHint, prefixIcon: Icons.mail_outline),
-                          const SizedBox(height: 10),
-                          DamuPillButton(
-                            text: _emailSent ? t.forgotPasswordResendButton : t.forgotPasswordSendButton,
-                            onPressed: _sendingEmail ? null : () => _sendEmail(t),
-                            background: DamuColors.primaryDeep,
-                            foreground: Colors.white,
-                          ),
-                          const SizedBox(height: 8),
-                          if (_emailSent)
-                            Text(
-                              t.forgotPasswordSent,
-                              style: const TextStyle(color: DamuColors.textPrimary),
-                              textAlign: TextAlign.center,
-                            ),
-                          const SizedBox(height: 16),
-                          Divider(color: Colors.white.withValues(alpha: 0.4)),
-                          const SizedBox(height: 12),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              t.forgotPasswordSubtitle,
-                              style: const TextStyle(color: DamuColors.textPrimary),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          DamuTextField(controller: _token, hint: t.resetTokenHint, prefixIcon: Icons.vpn_key_outlined),
-                          const SizedBox(height: 12),
-                          DamuTextField(controller: _password, hint: t.newPasswordHint, prefixIcon: Icons.lock_outline, obscure: true),
-                          const SizedBox(height: 12),
-                          DamuTextField(controller: _confirm, hint: t.confirmPasswordHint, prefixIcon: Icons.verified_outlined, obscure: true),
-                          const SizedBox(height: 16),
-                          DamuPillButton(
-                            text: t.resetPasswordButton,
-                            onPressed: session.isLoading || _resetting ? null : () => _resetPassword(t),
-                            background: Colors.white,
-                            foreground: DamuColors.primaryDeep,
-                          ),
-                          const SizedBox(height: 10),
-                          TextButton(
-                            onPressed: () => context.go('/auth/login'),
-                            style: TextButton.styleFrom(foregroundColor: Colors.white),
-                            child: Text(t.backToLoginButton),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 96),
+                Text(
+                  t.forgotPasswordTitle,
+                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Color(0xFF2A2A2A)),
                 ),
-              ),
+                const SizedBox(height: 6),
+                Text(
+                  t.forgotPasswordEnterEmail,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Color(0xFF9AA0A6)),
+                ),
+                const SizedBox(height: 28),
+                _AuthField(
+                  controller: _email,
+                  hint: t.emailHint,
+                  icon: Icons.mail_outline,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _sendingEmail ? null : () => _sendEmail(t),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2CA3C0),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, letterSpacing: 0.4),
+                    ),
+                    child: Text(_emailSent ? t.forgotPasswordResendButton : t.forgotPasswordSendButton),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (_emailSent)
+                  Text(
+                    t.forgotPasswordSent,
+                    style: const TextStyle(color: Color(0xFF6C7885), fontWeight: FontWeight.w600),
+                  ),
+                const SizedBox(height: 22),
+                Text(
+                  t.forgotPasswordSubtitle,
+                  style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF2A2A2A)),
+                ),
+                const SizedBox(height: 14),
+                _AuthField(
+                  controller: _token,
+                  hint: t.resetTokenHint,
+                  icon: Icons.vpn_key_outlined,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: 14),
+                _AuthField(
+                  controller: _password,
+                  hint: t.newPasswordHint,
+                  icon: Icons.lock_outline,
+                  obscureText: _obscurePassword,
+                  textInputAction: TextInputAction.next,
+                  suffix: IconButton(
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: const Color(0xFF9AA0A6)),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                _AuthField(
+                  controller: _confirm,
+                  hint: t.confirmPasswordHint,
+                  icon: Icons.verified_outlined,
+                  obscureText: _obscureConfirm,
+                  textInputAction: TextInputAction.done,
+                  suffix: IconButton(
+                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                    icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility, color: const Color(0xFF9AA0A6)),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: session.isLoading || _resetting ? null : () => _resetPassword(t),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2CA3C0),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, letterSpacing: 0.4),
+                    ),
+                    child: Text(t.resetPasswordButton),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Center(
+                  child: TextButton(
+                    onPressed: () => context.go('/auth/login'),
+                    style: TextButton.styleFrom(foregroundColor: const Color(0xFF2CA3C0)),
+                    child: Text(t.backToLoginButton),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
             ),
           ),
         ),
@@ -193,5 +217,49 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     } finally {
       if (mounted) setState(() => _resetting = false);
     }
+  }
+}
+
+class _AuthField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hint;
+  final IconData icon;
+  final bool obscureText;
+  final Widget? suffix;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+
+  const _AuthField({
+    required this.controller,
+    required this.hint,
+    required this.icon,
+    this.obscureText = false,
+    this.suffix,
+    this.keyboardType,
+    this.textInputAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF4F4F4),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        textInputAction: textInputAction,
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: Color(0xFF9AA0A6)),
+          prefixIcon: Icon(icon, color: const Color(0xFF2CA3C0)),
+          suffixIcon: suffix,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        ),
+      ),
+    );
   }
 }

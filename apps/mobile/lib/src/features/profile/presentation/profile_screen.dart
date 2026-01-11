@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../ui/damu_colors.dart';
 import '../../../ui/damu_widgets.dart';
@@ -15,6 +16,7 @@ class ProfileScreen extends ConsumerWidget {
     final t = AppLocalizations.of(context)!;
     final session = ref.watch(sessionControllerProvider).valueOrNull;
     final currentLang = session?.user.language ?? 'kz';
+    final weight = session?.user.weightKg;
 
     return Container(
       color: DamuColors.lightBg,
@@ -56,9 +58,27 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 6),
                 Text(session?.user.email ?? '—', style: const TextStyle(fontSize: 16)),
                 const SizedBox(height: 14),
-                Text(t.weightLabel, style: const TextStyle(color: Colors.black54)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(t.weightLabel, style: const TextStyle(color: Colors.black54)),
+                    IconButton(
+                      onPressed: () => context.push('/onboarding/goal'),
+                      icon: const Icon(Icons.edit),
+                      color: DamuColors.primary,
+                      tooltip: t.setGoalButton,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 6),
-                Text(session?.user.weightKg?.toString() ?? '—', style: const TextStyle(fontSize: 16)),
+                Row(
+                  children: [
+                    Text(weight?.toString() ?? '—', style: const TextStyle(fontSize: 16)),
+                    if (weight != null) const SizedBox(width: 6),
+                    if (weight != null) const Text('kg', style: TextStyle(color: Colors.black54)),
+                  ],
+                ),
                 const SizedBox(height: 18),
                 SizedBox(
                   width: double.infinity,
