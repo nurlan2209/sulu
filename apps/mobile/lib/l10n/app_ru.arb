@@ -12,6 +12,8 @@
   "fullNameHint": "ФИО",
   "emailHint": "Электронная почта",
   "passwordHint": "Пароль",
+  "passwordRequirements": "Пароль должен быть от 8 символов и содержать заглавную букву, цифру и спецсимвол.",
+  "registerFailed": "Не удалось зарегистрироваться. Попробуйте позже.",
   "forgotPasswordTitle": "Восстановление пароля",
   "forgotPasswordButton": "Забыли пароль?",
   "forgotPasswordSendButton": "Отправить письмо",

@@ -28,7 +28,7 @@ final localeControllerProvider = StateNotifierProvider<LocaleController, Locale?
 class LocaleController extends StateNotifier<Locale?> {
   static const _key = 'damu.language';
   final Ref _ref;
-  LocaleController(this._ref) : super(null) {
+  LocaleController(this._ref) : super(const Locale('kk')) {
     _load();
   }
 

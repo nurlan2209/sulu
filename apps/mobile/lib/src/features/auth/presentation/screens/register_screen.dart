@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:damu_app/gen_l10n/app_localizations.dart';
+import '../../../../core/network/api_exception.dart';
 import '../session_controller.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -16,13 +17,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _fullName = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
+  final _confirm = TextEditingController();
   bool _obscure = true;
+  bool _obscureConfirm = true;
 
   @override
   void dispose() {
     _fullName.dispose();
     _email.dispose();
     _password.dispose();
+    _confirm.dispose();
     super.dispose();
   }
 
@@ -72,10 +76,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   hint: t.passwordHint,
                   icon: Icons.lock_outline,
                   obscureText: _obscure,
-                  textInputAction: TextInputAction.done,
+                  textInputAction: TextInputAction.next,
                   suffix: IconButton(
                     onPressed: () => setState(() => _obscure = !_obscure),
                     icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: const Color(0xFF9AA0A6)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _AuthField(
+                  controller: _confirm,
+                  hint: t.confirmPasswordHint,
+                  icon: Icons.verified_outlined,
+                  obscureText: _obscureConfirm,
+                  textInputAction: TextInputAction.done,
+                  suffix: IconButton(
+                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                    icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility, color: const Color(0xFF9AA0A6)),
                   ),
                 ),
                 const SizedBox(height: 22),
@@ -85,15 +101,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   child: ElevatedButton(
                     onPressed: session.isLoading
                         ? null
-                        : () async {
-                            await ref.read(sessionControllerProvider.notifier).register(
-                                  fullName: _fullName.text.trim(),
-                                  email: _email.text.trim(),
-                                  password: _password.text,
-                                );
-                            if (!context.mounted) return;
-                            context.go('/onboarding/goal');
-                          },
+                        : () => _register(t),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2CA3C0),
                       foregroundColor: Colors.white,
@@ -126,6 +134,45 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _register(AppLocalizations t) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final password = _password.text;
+    final confirm = _confirm.text;
+    if (!_meetsPasswordRequirements(password)) {
+      messenger.showSnackBar(SnackBar(content: Text(t.passwordRequirements)));
+      return;
+    }
+    if (password != confirm) {
+      messenger.showSnackBar(SnackBar(content: Text(t.passwordsDoNotMatch)));
+      return;
+    }
+
+    await ref.read(sessionControllerProvider.notifier).register(
+          fullName: _fullName.text.trim(),
+          email: _email.text.trim(),
+          password: password,
+          confirmPassword: confirm,
+        );
+    if (!mounted) return;
+    final result = ref.read(sessionControllerProvider);
+    if (result.hasError) {
+      final err = result.error;
+      final message = err is ApiException ? err.message : t.registerFailed;
+      messenger.showSnackBar(SnackBar(content: Text(message)));
+      return;
+    }
+    if (!context.mounted) return;
+    context.go('/onboarding/goal');
+  }
+
+  bool _meetsPasswordRequirements(String value) {
+    if (value.length < 8 || value.length > 128) return false;
+    if (!RegExp(r'[A-Z]').hasMatch(value)) return false;
+    if (!RegExp(r'\d').hasMatch(value)) return false;
+    if (!RegExp(r'[^A-Za-z0-9\s]').hasMatch(value)) return false;
+    return true;
   }
 }
 

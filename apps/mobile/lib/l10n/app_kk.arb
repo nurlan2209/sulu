@@ -12,6 +12,8 @@
   "fullNameHint": "Аты‑жөніңіз",
   "emailHint": "Электронды пошта",
   "passwordHint": "Құпия сөз",
+  "passwordRequirements": "Құпия сөз кемінде 8 таңба болып, бас әріп, сан және арнайы таңба қамтуы тиіс.",
+  "registerFailed": "Тіркелу мүмкін болмады. Кейінірек көріңіз.",
   "forgotPasswordTitle": "Құпия сөзді қалпына келтіру",
   "forgotPasswordButton": "Құпия сөзді ұмыттыңыз ба?",
   "forgotPasswordSendButton": "Хат жіберу",

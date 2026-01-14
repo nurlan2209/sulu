@@ -11,6 +11,7 @@ class AuthApi {
     required String fullName,
     required String email,
     required String password,
+    required String confirmPassword,
     required String language,
     required String? timezone,
   }) async {
@@ -20,6 +21,7 @@ class AuthApi {
         'fullName': fullName,
         'email': email,
         'password': password,
+        'confirmPassword': confirmPassword,
         'language': language,
         if (timezone != null && timezone.isNotEmpty) 'timezone': timezone,
       },

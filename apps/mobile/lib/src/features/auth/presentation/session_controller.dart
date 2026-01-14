@@ -44,6 +44,7 @@ class SessionController extends AsyncNotifier<Session?> {
     required String fullName,
     required String email,
     required String password,
+    required String confirmPassword,
     String language = 'kz',
     String? timezone,
   }) async {
@@ -53,6 +54,7 @@ class SessionController extends AsyncNotifier<Session?> {
             fullName: fullName,
             email: email,
             password: password,
+            confirmPassword: confirmPassword,
             language: language,
             timezone: timezone,
           );

@@ -5,13 +5,32 @@ import { loginUser, registerUser, requestPasswordReset, resetPassword } from "..
 import { createEmailService } from "../services/emailService.js";
 import { toUserPublic } from "../serializers/user.js";
 
-const registerSchema = z.object({
-  fullName: z.string().min(1).max(80),
-  email: z.string().email(),
-  password: z.string().min(8).max(128),
-  language: z.enum(["kz", "ru"]).optional().default("kz"),
-  timezone: z.string().min(1).optional()
-});
+const passwordSchema = z
+  .string()
+  .min(8)
+  .max(128)
+  .refine((value) => /[A-Z]/.test(value), { message: "Password must include an uppercase letter" })
+  .refine((value) => /\d/.test(value), { message: "Password must include a number" })
+  .refine((value) => /[^A-Za-z0-9\s]/.test(value), { message: "Password must include a special character" });
+
+const registerSchema = z
+  .object({
+    fullName: z.string().min(1).max(80),
+    email: z.string().email(),
+    password: passwordSchema,
+    confirmPassword: z.string().min(8).max(128),
+    language: z.enum(["kz", "ru"]).optional().default("kz"),
+    timezone: z.string().min(1).optional()
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Passwords do not match",
+        path: ["confirmPassword"]
+      });
+    }
+  });
 
 const loginSchema = z.object({
   email: z.string().email(),
